@@ -1,0 +1,461 @@
+REPORTE DE SISTEMA - Sun Sep 20 23:07:50 GMT 2026
+
+==============================================
+  SISTEMA OPERATIVO
+==============================================
+Minix 10.0.2.15 3.3.0 Minix 3.3.0 (GENERIC) i386
+Host: 10.0.2.15
+11:07PM  up 10 mins, 2 users, load averages: 0.01, 0.00, 0.01
+
+==============================================
+  HARDWARE: CPU
+==============================================
+       processor: 0
+       vendor_id: GenuineIntel
+      model name: Intel
+      cpu family: 6
+           model: 10
+        stepping: 3
+         cpu MHz: 4092
+           flags: fpu vme apic mtrr pge pse36 clfsh acpi mmx sse sse2 ht tm pni monitor ds_cpl vmx est tm2 ssse3 cx16 xtpr pdcm sse4_1 popcnt xsave
+
+--- Carga del sistema (loadavg) ---
+0.01 0.00 0.01
+
+==============================================
+  HARDWARE: MEMORIA RAM
+==============================================
+4096 130959 119905 112068 4501
+==============================================
+  HARDWARE: DISCO
+==============================================
+--- Uso de particiones ---
+Filesystem    512-blocks       Used      Avail %Cap Mounted on
+/dev/c0d0p0s0     262144      71848     190296  27% /
+none                   0          0          0 100% /proc
+/dev/c0d0p0s2    3367840    2690656     677184  79% /usr
+/dev/c0d0p0s1     563200       8872     554328   1% /home
+none                   0          0          0 100% /sys
+--- Sistemas de archivos montados ---
+/dev/c0d0p0s0 on / type mfs (rw)
+none on /proc type procfs (rw)
+/dev/c0d0p0s2 on /usr type mfs (rw)
+/dev/c0d0p0s1 on /home type mfs (rw)
+none on /sys type devman (rw)
+--- Dispositivos de disco ---
+/dev/c0d0
+/dev/c0d0p0
+/dev/c0d0p0s0
+/dev/c0d0p0s1
+/dev/c0d0p0s2
+/dev/c0d0p0s3
+/dev/c0d0p1
+/dev/c0d0p1s0
+/dev/c0d0p1s1
+/dev/c0d0p1s2
+/dev/c0d0p1s3
+/dev/c0d0p2
+/dev/c0d0p2s0
+/dev/c0d0p2s1
+/dev/c0d0p2s2
+/dev/c0d0p2s3
+/dev/c0d0p3
+/dev/c0d0p3s0
+/dev/c0d0p3s1
+/dev/c0d0p3s2
+/dev/c0d0p3s3
+/dev/c0d1
+/dev/c0d1p0
+/dev/c0d1p0s0
+/dev/c0d1p0s1
+/dev/c0d1p0s2
+/dev/c0d1p0s3
+/dev/c0d1p1
+/dev/c0d1p1s0
+/dev/c0d1p1s1
+/dev/c0d1p1s2
+/dev/c0d1p1s3
+/dev/c0d1p2
+/dev/c0d1p2s0
+/dev/c0d1p2s1
+/dev/c0d1p2s2
+/dev/c0d1p2s3
+/dev/c0d1p3
+/dev/c0d1p3s0
+/dev/c0d1p3s1
+/dev/c0d1p3s2
+/dev/c0d1p3s3
+/dev/c0d2
+/dev/c0d2p0
+/dev/c0d2p0s0
+/dev/c0d2p0s1
+/dev/c0d2p0s2
+/dev/c0d2p0s3
+/dev/c0d2p1
+/dev/c0d2p1s0
+/dev/c0d2p1s1
+/dev/c0d2p1s2
+/dev/c0d2p1s3
+/dev/c0d2p2
+/dev/c0d2p2s0
+/dev/c0d2p2s1
+/dev/c0d2p2s2
+/dev/c0d2p2s3
+/dev/c0d2p3
+/dev/c0d2p3s0
+/dev/c0d2p3s1
+/dev/c0d2p3s2
+/dev/c0d2p3s3
+/dev/c0d3
+/dev/c0d3p0
+/dev/c0d3p0s0
+/dev/c0d3p0s1
+/dev/c0d3p0s2
+/dev/c0d3p0s3
+/dev/c0d3p1
+/dev/c0d3p1s0
+/dev/c0d3p1s1
+/dev/c0d3p1s2
+/dev/c0d3p1s3
+/dev/c0d3p2
+/dev/c0d3p2s0
+/dev/c0d3p2s1
+/dev/c0d3p2s2
+/dev/c0d3p2s3
+/dev/c0d3p3
+/dev/c0d3p3s0
+/dev/c0d3p3s1
+/dev/c0d3p3s2
+/dev/c0d3p3s3
+/dev/c0d4
+/dev/c0d4p0
+/dev/c0d4p0s0
+/dev/c0d4p0s1
+/dev/c0d4p0s2
+/dev/c0d4p0s3
+/dev/c0d4p1
+/dev/c0d4p1s0
+/dev/c0d4p1s1
+/dev/c0d4p1s2
+/dev/c0d4p1s3
+/dev/c0d4p2
+/dev/c0d4p2s0
+/dev/c0d4p2s1
+/dev/c0d4p2s2
+/dev/c0d4p2s3
+/dev/c0d4p3
+/dev/c0d4p3s0
+/dev/c0d4p3s1
+/dev/c0d4p3s2
+/dev/c0d4p3s3
+/dev/c0d5
+/dev/c0d5p0
+/dev/c0d5p0s0
+/dev/c0d5p0s1
+/dev/c0d5p0s2
+/dev/c0d5p0s3
+/dev/c0d5p1
+/dev/c0d5p1s0
+/dev/c0d5p1s1
+/dev/c0d5p1s2
+/dev/c0d5p1s3
+/dev/c0d5p2
+/dev/c0d5p2s0
+/dev/c0d5p2s1
+/dev/c0d5p2s2
+/dev/c0d5p2s3
+/dev/c0d5p3
+/dev/c0d5p3s0
+/dev/c0d5p3s1
+/dev/c0d5p3s2
+/dev/c0d5p3s3
+/dev/c0d6
+/dev/c0d6p0
+/dev/c0d6p0s0
+/dev/c0d6p0s1
+/dev/c0d6p0s2
+/dev/c0d6p0s3
+/dev/c0d6p1
+/dev/c0d6p1s0
+/dev/c0d6p1s1
+/dev/c0d6p1s2
+/dev/c0d6p1s3
+/dev/c0d6p2
+/dev/c0d6p2s0
+/dev/c0d6p2s1
+/dev/c0d6p2s2
+/dev/c0d6p2s3
+/dev/c0d6p3
+/dev/c0d6p3s0
+/dev/c0d6p3s1
+/dev/c0d6p3s2
+/dev/c0d6p3s3
+/dev/c0d7
+/dev/c0d7p0
+/dev/c0d7p0s0
+/dev/c0d7p0s1
+/dev/c0d7p0s2
+/dev/c0d7p0s3
+/dev/c0d7p1
+/dev/c0d7p1s0
+/dev/c0d7p1s1
+/dev/c0d7p1s2
+/dev/c0d7p1s3
+/dev/c0d7p2
+/dev/c0d7p2s0
+/dev/c0d7p2s1
+/dev/c0d7p2s2
+/dev/c0d7p2s3
+/dev/c0d7p3
+/dev/c0d7p3s0
+/dev/c0d7p3s1
+/dev/c0d7p3s2
+/dev/c0d7p3s3
+
+==============================================
+  HARDWARE: PCI / GPU / DISPOSITIVOS
+==============================================
+0.0.0 6/0/0 8086:1237 Intel 82441FX (440FX)
+0.1.0 6/1/0 8086:7000 Intel 82371SB
+0.1.1 1/1/8a 8086:7111 Intel 82371AB (IDE)
+0.2.0 3/0/0 80EE:BEEF
+0.3.0 2/0/0 1022:2000 AMD Lance/PCI
+0.4.0 8/80/0 80EE:CAFE Oracle VirtualBox backdoor device
+0.5.0 4/1/0 8086:2415
+0.6.0 c/3/10 106B:003F
+0.7.0 6/80/0 8086:7113 Intel 82371AB (Power)
+0.11.0 c/3/20 8086:265C
+--- Coincidencias con video/VGA ---
+(no se detecto GPU dedicada)
+==============================================
+  HARDWARE: RED
+==============================================
+/dev/ip0: address 10.0.2.15 netmask 255.255.255.0 mtu 1500
+
+==============================================
+  SOFTWARE: PROCESOS
+==============================================
+Total de procesos (aprox.):       54
+--- Lista de procesos ---
+  PID TTY  TIME CMD
+ (-5)   ?  0:00 asyncm
+ (-4)   ?  0:00 idle
+ (-3)   ?  0:00 clock
+ (-2)   ?  0:00 system
+ (-1)   ?  0:00 kernel
+    5   ?  0:00 pm
+    7   ?  0:00 vfs
+    4   ?  0:00 rs
+    8   ?  0:00 memory
+    6   ?  0:00 sched
+    9   ?  0:00 tty
+    3   ?  0:00 ds
+   11   ?  0:00 vm
+   12   ?  0:00 pfs
+    1   ?  0:00 init
+   17   ?  0:00 /service/pci
+   19   ?  0:00 /service/input
+   21   ?  0:00 /service/pckbd
+   29   ?  0:00 /service/floppy
+   32   ?  0:07 /service/at_wini
+   40   ?  0:00 /service/procfs
+   49   ?  0:00 /service/mfs /dev/c0d0p0s0 /
+   59   ?  0:00 /service/is
+   62   ?  0:00 /service/readclock.drv
+   73   ?  0:00 /service/mfs /dev/c0d0p0s2 /usr -o rw
+   76   ?  0:00 /service/mfs /dev/c0d0p0s1 /home -o rw
+   79   ?  0:00 /service/devman (null) /sys -o rw,rslabel=devman
+  118   ?  0:00 /service/random
+  134   ?  0:01 /service/lance instance=0
+  139   ?  0:00 /service/inet
+  143   ?  0:00 /service/pty
+  147   ?  0:00 /service/uds
+  151   ?  0:00 /service/ipc
+  155   ?  0:00 /service/log
+  164   ?  0:00 /service/vbox
+  319  p0  0:00 sh monitor.sh
+  320  p0  0:00 more
+  337  p0  0:00 ps -ax
+  107   ?  0:00 devmand -d /etc/devmand -d /usr/pkg/etc/devmand
+  167   ?  0:00 update
+  169   ?  0:00 cron
+  176   ?  0:00 syslogd
+  177   ?  0:00 dhcpd
+  179   ?  0:00 nonamed -L
+  228   ?  0:00 /usr/pkg/sbin/sshd
+  229  co  0:00 -sh
+  230  c1  0:00 /usr/libexec/getty default ttyc1
+ 231  c2  0:00 /usr/libexec/getty default ttyc2
+  232  c3  0:00 /usr/libexec/getty default ttyc3
+  235   ?  0:01 /usr/pkg/sbin/sshd -R
+  236  p0  0:00 -sh
+
+==============================================
+  SOFTWARE: SERVICIOS DEL SISTEMA (servers y drivers)
+==============================================
+acpi
+ahci
+amddev
+at_wini
+atl2
+dec21140A
+devman
+dp8390
+dpeth
+ds
+e1000
+es1370
+es1371
+ext2
+fbd
+filter
+floppy
+fxp
+hello
+hgfs
+inet
+input
+ipc
+is
+lance
+log
+lwip
+memory
+mfs
+mmc
+orinoco
+pci
+pckbd
+pfs
+pm
+printer
+procfs
+pty
+random
+readclock.drv
+rs
+rtl8139
+rtl8169
+sb16
+sched
+ti1225
+tty
+uds
+usb_hub
+usb_storage
+vbfs
+vbox
+vfs
+virtio_blk
+virtio_net
+vm
+vnd
+
+==============================================
+  SOFTWARE: PAQUETES INSTALADOS
+==============================================
+openssl-1.0.1g      Secure Socket Layer and cryptographic library
+pkg_install-20130902nb1 Package management and administration tools for pkgsrc
+pkgin-0.6.4nb5      Apt / yum like tool for managing pkgsrc binary packages
+gettext-lib-0.18.3.2 Internationalized Message Handling Library (libintl)
+libidn-1.28         Internationalized Domain Names command line tool
+libfontenc-1.1.2    The fontenc Library from X.org
+freetype2-2.5.3nb1  Font rendering engine and library API
+perl-5.18.2nb1      Practical Extraction and Report Language
+pth-2.0.7nb3        GNU Portable Thread library
+p5-Carp-Clan-6.04nb4 Report errors from perspective of a "clan" of modules
+p5-Bit-Vector-7.3nb1 Efficient base class implementing bit vectors
+p5-IO-tty-1.10nb3   Another Perl class for I/O on tty and pseudo-tty devices
+p5-Term-ReadKey-2.30nb6 Change terminal modes and perform non-blocking reads
+m4-1.4.17           GNU version of UNIX m4 macro language processor
+p5-Net-SSLeay-1.58  Perl5 module for using OpenSSL
+p5-Net-LibIDN-0.12nb5 Perl bindings for GNU Libidn
+mkfontscale-1.1.1   X11 Scalable Font Index Generator
+mkfontdir-1.0.7     X11 Font Index Generator
+encodings-1.0.4nb1  X11 Font Index Generator
+p5-Term-Prompt-1.04nb6 Perl extension for prompting a user for information
+p5-IPC-Run-0.92nb1  Perl module for interacting with child processes
+p5-Date-Calc-6.3nb4 Perl5 module for Gregorian calendar date calculations
+autoconf-2.69nb4    Generates automatic source code configuration scripts
+GutenMark-words-20030107 Word lists for GutenMark
+verilog-0.9.7       Verilog simulation and synthesis tool (stable release version)
+tcp_wrappers-7.6.4  Monitor and filter incoming requests for network services
+glib-1.2.10nb10     Some useful routines for C programming (glib1)
+p5-MIME-Base64-3.14 Perl5 module for Base64 and Quoted-Printable encodings
+p5-IO-Socket-SSL-1.967 Perl5 SSL socket interface class
+readline-6.3        GNU library that can recall and edit previous input
+
+==============================================
+  SOFTWARE: CONSUMO DE RECURSOS POR PROCESO
+==============================================
+ST UID   PID  PPID  PGRP     SZ         RECV TTY  TIME CMD
+ W   0  (-5)     0     0      0                ?  0:00 asyncm
+ W   0  (-4)     0     0      0                ?  0:00 idle
+ W   0  (-3)     0     0      0                ?  0:00 clock
+ W   0  (-2)     0     0      0                ?  0:00 system
+ W   0  (-1)     0     0      0                ?  0:00 kernel
+ W   0     5     4   236    596          ANY   ?  0:00 pm
+ W   0     7     4     0   1212          ANY   ?  0:00 vfs
+ W   0     4     1     0   1200          ANY   ?  0:00 rs
+ W   0     8     4     0    116          ANY   ?  0:00 memory
+ W   0     6     4     0     48          ANY   ?  0:00 sched
+ W   0     9     4     0    180          ANY   ?  0:00 tty
+ W   0     3     4     0    156          ANY   ?  0:00 ds
+ W   0    11     4     0   5192          ANY   ?  0:00 vm
+ W  12    12     4     0    596          ANY   ?  0:00 pfs
+ S   0     1     0     1    428    (wait) pm   ?  0:00 init
+ W   0    17     4     0    120          ANY   ?  0:00 /service/pci
+ W  12    19     4     0    100          ANY   ?  0:00 /service/input
+ W  12    21     4     0     52          ANY   ?  0:00 /service/pckbd
+ W  12    29     4     0    124          ANY   ?  0:00 /service/floppy
+ W  12    32     4     0    188          ANY   ?  0:07 /service/at_wini
+ R   0    40     4     0   1208                ?  0:00 /service/procfs
+ W  12    49     4     0   5428          ANY   ?  0:00 /service/mfs /dev/c0d0p0s0 /
+ W   0    59     4     0   1460          ANY   ?  0:00 /service/is
+ W   0    62     4     0     52          ANY   ?  0:00 /service/readclock.drv
+ W  12    73     4     0  17728          ANY   ?  0:00 /service/mfs /dev/c0d0p0s2 /usr -o rw
+ W  12    76     4     0    324          ANY   ?  0:00 /service/mfs /dev/c0d0p0s1 /home -o rw
+ W   0    79     4     0    200          ANY   ?  0:00 /service/devman (null) /sys -o rw,rslabel=devman
+ W  12   118     4     0    132          ANY   ?  0:00 /service/random
+ W   0   134     4     0    112          ANY   ?  0:01 /service/lance instance=0
+ W  12   139     4     0   1152          ANY   ?  0:00 /service/inet
+ W  12   143     4     0    204          ANY   ?  0:00 /service/pty
+ W   0   147     4     0    544          ANY   ?  0:00 /service/uds
+ W   0   151     4     0    148          ANY   ?  0:00 /service/ipc
+ W  12   155     4     0    148          ANY   ?  0:00 /service/log
+ W   0   164     4     0    104          ANY   ?  0:00 /service/vbox
+ S   0   319   236   236    500    (wait) pm  p0  0:00 sh monitor.sh
+ S   0   320   236   236    364    (pty) vfs  p0  0:00 more
+ W   0   341   319   236    256          vfs  p0  0:00 ps -axl
+ S   0   107     1    13    188 (select) vfs   ?  0:00 devmand -d /etc/devmand -d /usr/pkg/etc/devmand
+ S   0   167     1    13     68 (select) vfs   ?  0:00 update
+ S   0   169     1    13    316 (sigsusp) pm   ?  0:00 cron
+ W   0    59     4     0   1460          ANY   ?  0:00 /service/is
+ W   0    62     4     0     52          ANY   ?  0:00 /service/readclock.drv
+ W  12    73     4     0  17728          ANY   ?  0:00 /service/mfs /dev/c0d0p0s2 /usr -o rw
+ W  12    76     4     0    324          ANY   ?  0:00 /service/mfs /dev/c0d0p0s1 /home -o rw
+ W   0    79     4     0    200          ANY   ?  0:00 /service/devman (null) /sys -o rw,rslabel=devman
+ W  12   118     4     0    132          ANY   ?  0:00 /service/random
+ W   0   134     4     0    112          ANY   ?  0:01 /service/lance instance=0
+ W  12   139     4     0   1152          ANY   ?  0:00 /service/inet
+ W  12   143     4     0    204          ANY   ?  0:00 /service/pty
+ W   0   147     4     0    544          ANY   ?  0:00 /service/uds
+ W   0   151     4     0    148          ANY   ?  0:00 /service/ipc
+ W  12   155     4     0    148          ANY   ?  0:00 /service/log
+ W   0   164     4     0    104          ANY   ?  0:00 /service/vbox
+ S   0   319   236   236    500    (wait) pm  p0  0:00 sh monitor.sh
+ S   0   320   236   236    364    (pty) vfs  p0  0:00 more
+ W   0   341   319   236    256          vfs  p0  0:00 ps -axl
+ S   0   107     1    13    188 (select) vfs   ?  0:00 devmand -d /etc/devmand -d /usr/pkg/etc/devmand
+ S   0   167     1    13     68 (select) vfs   ?  0:00 update
+ S   0   169     1    13    316 (sigsusp) pm   ?  0:00 cron
+ S   0   176     1   176    312 (select) vfs   ?  0:00 syslogd
+ S   0   177     1    13    212 (select) vfs   ?  0:00 dhcpd
+ S   0   179     1    13    228 (select) vfs   ?  0:00 nonamed -L
+ S   0   228     1   228   2032 (select) vfs   ?  0:00 /usr/pkg/sbin/sshd
+ S   0   229     1   229    536    (tty) vfs  co  0:00 -sh
+ S   0   230     1   230    240    (tty) vfs  c1  0:00 /usr/libexec/getty default ttyc1
+ S   0   231     1   231    240    (tty) vfs  c2  0:00 /usr/libexec/getty default ttyc2
+ S   0   232     1   232    240    (tty) vfs  c3  0:00 /usr/libexec/getty default ttyc3
+ S   0   235   228   235   2472 (select) vfs   ?  0:01 /usr/pkg/sbin/sshd -R
+ S   0   236   235   236    576    (wait) pm  p0  0:00 -sh
