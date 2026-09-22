@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MINIX 3 · Panel de monitoreo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">Ir al contenido</a>
+
+  <header class="top">
+    <div class="top-inner">
+      <div class="ident">
+        <div>
+          <h1>MINIX 3 <span>· panel de monitoreo</span></h1>
+          <p class="ident-meta" id="meta"></p>
+        </div>
+        <button class="theme-btn" id="theme-btn" type="button" aria-pressed="false">Cambiar tema</button>
+      </div>
+
+      <nav class="tabs" role="tablist" aria-label="Secciones del panel">
+        <button class="tab" role="tab" id="tab-resumen"  aria-controls="view-resumen"  aria-selected="true"  type="button">Resumen</button>
+        <button class="tab" role="tab" id="tab-hardware" aria-controls="view-hardware" aria-selected="false" type="button" tabindex="-1">Hardware</button>
+        <button class="tab" role="tab" id="tab-procesos" aria-controls="view-procesos" aria-selected="false" type="button" tabindex="-1">Procesos</button>
+        <button class="tab" role="tab" id="tab-software" aria-controls="view-software" aria-selected="false" type="button" tabindex="-1">Software</button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="view" id="view-resumen"  role="tabpanel" aria-labelledby="tab-resumen"></section>
+    <section class="view" id="view-hardware" role="tabpanel" aria-labelledby="tab-hardware" hidden></section>
+    <section class="view" id="view-procesos" role="tabpanel" aria-labelledby="tab-procesos" hidden></section>
+    <section class="view" id="view-software" role="tabpanel" aria-labelledby="tab-software" hidden></section>
+
+    <p class="foot">
+      Los datos son una captura única de <code>monitor.sh</code> tomada del informe.
+      Para mostrar otra captura, edita el objeto <code>DATA</code> al inicio de <code>app.js</code>.
+    </p>
+  </main>
+
+  <noscript><p style="padding:24px">Este panel necesita JavaScript activado.</p></noscript>
+  <script src="app.js"></script>
+</body>
+</html>
