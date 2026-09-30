@@ -1,0 +1,1359 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Monitor de Algoritmos de Planificación de Procesos CPU</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,800;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
+
+      body {
+        font-family: "Plus Jakarta Sans", sans-serif;
+      }
+
+      .code-font {
+        font-family: "JetBrains Mono", monospace;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 5px;
+        height: 6px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: rgba(15, 23, 42, 0.6);
+        border-radius: 4px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(51, 65, 85, 0.8);
+        border-radius: 4px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: rgba(71, 85, 105, 1);
+      }
+
+      .timeline-grid {
+        background-size: 24px 100%;
+        background-image: linear-gradient(
+          to right,
+          rgba(255, 255, 255, 0.05) 1px,
+          transparent 1px
+        );
+      }
+
+      #process-tooltip {
+        transition:
+          opacity 0.15s ease-in-out,
+          transform 0.1s ease-out;
+        pointer-events: none;
+        z-index: 100;
+      }
+
+      .gantt-block {
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .gantt-block:hover {
+        filter: brightness(1.25);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      }
+
+      /* Subtle glow effects */
+      .glow-cyan {
+        box-shadow: 0 0 15px rgba(6, 182, 212, 0.15);
+      }
+      .glow-emerald {
+        box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
+      }
+      .glow-amber {
+        box-shadow: 0 0 15px rgba(245, 158, 11, 0.15);
+      }
+      .glow-purple {
+        box-shadow: 0 0 15px rgba(168, 85, 247, 0.15);
+      }
+    </style>
+  </head>
+  <body
+    class="bg-slate-950 text-slate-100 min-h-screen flex flex-col overflow-x-hidden selection:bg-cyan-500 selection:text-slate-950"
+  >
+    <header
+      class="bg-slate-900/90 border-b border-slate-800 px-4 py-2.5 sticky top-0 z-50 backdrop-blur-md flex flex-wrap items-center justify-between gap-3 shadow-xl"
+    >
+      <div class="flex items-center space-x-3">
+        <div
+          class="p-2 bg-gradient-to-tr from-cyan-600 to-blue-600 rounded-xl text-white shadow-lg shadow-cyan-500/20"
+        >
+          <i data-lucide="cpu" class="w-5 h-5 animate-pulse"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-extrabold text-base tracking-tight text-white">
+              Simulador de Planificación de CPU
+            </h1>
+            <span
+              class="text-[10px] code-font bg-cyan-950 text-cyan-400 border border-cyan-800/60 px-2 py-0.5 rounded-full font-semibold"
+              >OS Kernel Kernel v5.4</span
+            >
+          </div>
+          <p class="text-xs text-slate-400">
+            Comparativa de algoritmos de programación en tiempo real (Cuadrícula
+            2x2)
+          </p>
+        </div>
+      </div>
+
+      <!-- Global controls bar -->
+      <div class="flex items-center flex-wrap gap-2 text-xs">
+        <!-- Proceso Info Pills -->
+        <div
+          class="hidden xl:flex items-center gap-1.5 bg-slate-950/80 px-3 py-1.5 rounded-lg border border-slate-800 text-[11px] code-font mr-2"
+        >
+          <span class="text-slate-400 font-sans mr-1">Procesos:</span>
+          <span
+            class="px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30"
+            >P1</span
+          >
+          <span
+            class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+            >P2</span
+          >
+          <span
+            class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30"
+            >P3</span
+          >
+          <span
+            class="px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-400 border border-purple-500/30"
+            >P4</span
+          >
+          <span
+            class="px-1.5 py-0.5 rounded bg-pink-500/20 text-pink-400 border border-pink-500/30"
+            >P5</span
+          >
+        </div>
+
+        <button
+          id="btn-add-process"
+          class="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition font-medium"
+        >
+          <i data-lucide="plus-circle" class="w-3.5 h-3.5 text-cyan-400"></i>
+          Agregar Proceso
+        </button>
+        <button
+          id="btn-reset"
+          class="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition font-medium"
+        >
+          <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 text-slate-400"></i>
+          Resetear
+        </button>
+        <button
+          id="btn-run"
+          class="flex items-center gap-1.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold px-3.5 py-1.5 rounded-lg shadow-lg shadow-cyan-500/20 transition"
+        >
+          <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i>
+          Simular Todo
+        </button>
+      </div>
+    </header>
+
+    <main
+      class="flex-1 p-3 lg:p-4 grid grid-cols-1 lg:grid-cols-2 gap-4 h-[calc(100vh-61px)]"
+    >
+      <!-- ================= ESQUINA SUPERIOR IZQUIERDA: 1. FCFS / FIFO ================= -->
+      <section
+        class="bg-slate-900/80 rounded-2xl border border-cyan-500/30 flex flex-col overflow-hidden shadow-2xl glow-cyan hover:border-cyan-500/60 transition"
+      >
+        <!-- Header -->
+        <div
+          class="p-3 bg-slate-900 border-b border-slate-800 flex justify-between items-center flex-wrap gap-2"
+        >
+          <div class="flex items-center gap-2.5">
+            <span
+              class="w-3 h-3 rounded-full bg-cyan-400 shadow-sm shadow-cyan-400/80"
+            ></span>
+            <div>
+              <h2
+                class="font-bold text-sm text-cyan-300 flex items-center gap-2"
+              >
+                1. FCFS / FIFO
+                <span
+                  class="text-[10px] font-semibold code-font px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700"
+                  >First-In, First-Out</span
+                >
+              </h2>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span
+              class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center gap-1"
+            >
+              <i data-lucide="lock" class="w-2.5 h-2.5"></i> No Expulsivo
+            </span>
+            <button
+              class="text-slate-400 hover:text-white p-1 rounded hover:bg-slate-800"
+              title="Expandir"
+            >
+              <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Content Area: Table + Gantt Split -->
+        <div class="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-3">
+          <!-- Mini Processes Table -->
+          <div
+            class="overflow-x-auto rounded-lg border border-slate-800 bg-slate-950/50"
+          >
+            <table class="w-full text-left text-[11px] code-font">
+              <thead
+                class="bg-slate-800/60 text-slate-400 border-b border-slate-800"
+              >
+                <tr>
+                  <th class="p-1.5 font-semibold">PID</th>
+                  <th class="p-1.5 font-semibold">Llegada (AT)</th>
+                  <th class="p-1.5 font-semibold">Ráfaga (BT)</th>
+                  <th class="p-1.5 font-semibold">Prioridad</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800/50 text-slate-300">
+                <tr class="hover:bg-slate-800/30">
+                  <td
+                    class="p-1.5 font-bold text-blue-400 flex items-center gap-1.5"
+                  >
+                    <span class="w-2 h-2 rounded-full bg-blue-500"></span> P1
+                  </td>
+                  <td class="p-1.5">0 ms</td>
+                  <td class="p-1.5">4 ms</td>
+                  <td class="p-1.5 text-slate-500">2</td>
+                </tr>
+                <tr class="hover:bg-slate-800/30">
+                  <td
+                    class="p-1.5 font-bold text-emerald-400 flex items-center gap-1.5"
+                  >
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span> P2
+                  </td>
+                  <td class="p-1.5">1 ms</td>
+                  <td class="p-1.5">3 ms</td>
+                  <td class="p-1.5 text-slate-500">1</td>
+                </tr>
+                <tr class="hover:bg-slate-800/30">
+                  <td
+                    class="p-1.5 font-bold text-amber-400 flex items-center gap-1.5"
+                  >
+                    <span class="w-2 h-2 rounded-full bg-amber-500"></span> P3
+                  </td>
+                  <td class="p-1.5">2 ms</td>
+                  <td class="p-1.5">1 ms</td>
+                  <td class="p-1.5 text-slate-500">4</td>
+                </tr>
+                <tr class="hover:bg-slate-800/30">
+                  <td
+                    class="p-1.5 font-bold text-purple-400 flex items-center gap-1.5"
+                  >
+                    <span class="w-2 h-2 rounded-full bg-purple-500"></span> P4
+                  </td>
+                  <td class="p-1.5">3 ms</td>
+                  <td class="p-1.5">5 ms</td>
+                  <td class="p-1.5 text-slate-500">3</td>
+                </tr>
+                <tr class="hover:bg-slate-800/30">
+                  <td
+                    class="p-1.5 font-bold text-pink-400 flex items-center gap-1.5"
+                  >
+                    <span class="w-2 h-2 rounded-full bg-pink-500"></span> P5
+                  </td>
+                  <td class="p-1.5">4 ms</td>
+                  <td class="p-1.5">2 ms</td>
+                  <td class="p-1.5 text-slate-500">5</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Gantt Chart Timeline -->
+          <div class="space-y-1">
+            <div
+              class="flex justify-between items-center text-[11px] text-slate-400 font-semibold mb-1"
+            >
+              <span>Diagrama de Gantt (Unidades de Tiempo)</span>
+              <span class="code-font text-cyan-400">Total: 15ms</span>
+            </div>
+
+            <div class="overflow-x-auto custom-scrollbar pb-2">
+              <div class="w-[480px]">
+                <!-- Time Axis Header -->
+                <div
+                  class="flex text-[10px] code-font text-slate-500 border-b border-slate-800 pb-1 mb-1"
+                >
+                  <div style="width: 26.66%" class="text-left">0</div>
+                  <div style="width: 20%" class="text-left">4</div>
+                  <div style="width: 6.66%" class="text-left">7</div>
+                  <div style="width: 33.33%" class="text-left">8</div>
+                  <div style="width: 13.33%" class="text-left">13</div>
+                  <div class="text-right">15</div>
+                </div>
+
+                <!-- Gantt Timeline Track -->
+                <div
+                  class="h-9 bg-slate-950/80 rounded-lg border border-slate-800 p-1 flex relative timeline-grid items-center"
+                >
+                  <!-- Block P1 (0 - 4) -->
+                  <div
+                    class="gantt-block h-full bg-blue-600/90 border border-blue-400/50 rounded text-[10px] font-bold text-white flex items-center justify-center cursor-pointer shadow-sm code-font"
+                    style="width: 26.66%"
+                    data-pid="P1"
+                    data-start="0"
+                    data-end="4"
+                    data-duration="4 ms"
+                    data-status="Ejecutado (FCFS)"
+                    data-color="blue"
+                  >
+                    P1 (4ms)
+                  </div>
+                  <!-- Block P2 (4 - 7) -->
+                  <div
+                    class="gantt-block h-full bg-emerald-600/90 border border-emerald-400/50 rounded text-[10px] font-bold text-white flex items-center justify-center cursor-pointer shadow-sm code-font"
+                    style="width: 20%"
+                    data-pid="P2"
+                    data-start="4"
+                    data-end="7"
+                    data-duration="3 ms"
+                    data-status="Ejecutado (FCFS)"
+                    data-color="emerald"
+                  >
+                    P2 (3ms)
+                  </div>
+                  <!-- Block P3 (7 - 8) -->
+                  <div
+                    class="gantt-block h-full bg-amber-600/90 border border-amber-400/50 rounded text-[10px] font-bold text-white flex items-center justify-center cursor-pointer shadow-sm code-font"
+                    style="width: 6.66%"
+                    data-pid="P3"
+                    data-start="7"
+                    data-end="8"
+                    data-duration="1 ms"
+                    data-status="Ejecutado (FCFS)"
+                    data-color="amber"
+                  >
+                    P3
+                  </div>
+                  <!-- Block P4 (8 - 13) -->
+                  <div
+                    class="gantt-block h-full bg-purple-600/90 border border-purple-400/50 rounded text-[10px] font-bold text-white flex items-center justify-center cursor-pointer shadow-sm code-font"
+                    style="width: 33.33%"
+                    data-pid="P4"
+                    data-start="8"
+                    data-end="13"
+                    data-duration="5 ms"
+                    data-status="Ejecutado (FCFS)"
+                    data-color="purple"
+                  >
+                    P4 (5ms)
+                  </div>
+                  <!-- Block P5 (13 - 15) -->
+                  <div
+                    class="gantt-block h-full bg-pink-600/90 border border-pink-400/50 rounded text-[10px] font-bold text-white flex items-center justify-center cursor-pointer shadow-sm code-font"
+                    style="width: 13.33%"
+                    data-pid="P5"
+                    data-start="13"
+                    data-end="15"
+                    data-duration="2 ms"
+                    data-status="Ejecutado (FCFS)"
+                    data-color="pink"
+                  >
+                    P5 (2ms)
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer Metrics Summary -->
+        <div
+          class="p-2.5 bg-slate-900 border-t border-slate-800 grid grid-cols-3 gap-2 text-[11px] code-font"
+        >
+          <div
+            class="bg-slate-950/60 p-1.5 rounded border border-slate-800 text-center"
+          >
+            <span class="text-slate-400 text-[10px] block font-sans"
+              >Espera Prom. (WT)</span
+            >
+            <span class="font-bold text-cyan-400">4.20 ms</span>
+          </div>
+          <div
+            class="bg-slate-950/60 p-1.5 rounded border border-slate-800 text-center"
+          >
+            <span class="text-slate-400 text-[10px] block font-sans"
+              >Retorno Prom. (TAT)</span
+            >
+            <span class="font-bold text-cyan-400">7.20 ms</span>
+          </div>
+          <div
+            class="bg-slate-950/60 p-1.5 rounded border border-slate-800 text-center"
+          >
+            <span class="text-slate-400 text-[10px] block font-sans"
+              >Uso de CPU</span
+            >
+            <span class="font-bold text-emerald-400">100.0%</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= ESQUINA SUPERIOR DERECHA: 2. SJF ================= -->
+      <section
+        class="bg-slate-900/80 rounded-2xl border border-emerald-500/30 flex flex-col overflow-hidden shadow-2xl glow-emerald hover:border-emerald-500/60 transition"
+      >
+        <!-- Header -->
+        <div
+          class="p-3 bg-slate-900 border-b border-slate-800 flex justify-between items-center flex-wrap gap-2"
+        >
+          <div class="flex items-center gap-2.5">
+            <span
+              class="w-3 h-3 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/80"
+            ></span>
+            <div>
+              <h2
+                class="font-bold text-sm text-emerald-300 flex items-center gap-2"
+              >
+                2. SJF
+                <span
+                  class="text-[10px] font-semibold code-font px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700"
+                  >Shortest Job First</span
+                >
+              </h2>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span
+              class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center gap-1"
+            >
+              <i data-lucide="lock" class="w-2.5 h-2.5"></i> No Expulsivo
+            </span>
+            <button
+              class="text-slate-400 hover:text-white p-1 rounded hover:bg-slate-800"
+              title="Expandir"
+            >
+              <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-3">
+          <!-- Mini Processes Table -->
+          <div
+            class="overflow-x-auto rounded-lg border border-slate-800 bg-slate-950/50"
+          >
+            <table class="w-full text-left text-[11px] code-font">
+              <thead
+                class="bg-slate-800/60 text-slate-400 border-b border-slate-800"
+              >
+                <tr>
+                  <th class="p-1.5 font-semibold">PID</th>
+                  <th class="p-1.5 font-semibold">Llegada (AT)</th>
+                  <th class="p-1.5 font-semibold">Ráfaga (BT)</th>
+                  <th class="p-1.5 font-semibold">Prioridad</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800/50 text-slate-300">
+                <tr class="hover:bg-slate-800/30">
+                  <td
+                    class="p-1.5 font-bold text-blue-400 flex items-center gap-1.5"
+                  >
+                    <span class="w-2 h-2 rounded-full bg-blue-500"></span> P1
+                  </td>
+                  <td class="p-1.5">0 ms</td>
+                  <td class="p-1.5">4 ms</td>
+                  <td class="p-1.5 text-slate-500">2</td>
+                </tr>
+                <tr class="hover:bg-slate-800/30">
+                  <td
+                    class="p-1.5 font-bold text-emerald-400 flex items-center gap-1.5"
+                  >
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span> P2
+                  </td>
+                  <td class="p-1.5">1 ms</td>
+                  <td class="p-1.5">3 ms</td>
+                  <td class="p-1.5 text-slate-500">1</td>
+                </tr>
+                <tr class="hover:bg-slate-800/30">
+                  <td
+                    class="p-1.5 font-bold text-amber-400 flex items-center gap-1.5"
+                  >
+                    <span class="w-2 h-2 rounded-full bg-amber-500"></span> P3
+                  </td>
+                  <td class="p-1.5">2 ms</td>
+                  <td class="p-1.5">1 ms</td>
+                  <td class="p-1.5 text-slate-500">4</td>
+                </tr>
+                <tr class="hover:bg-slate-800/30">
+                  <td
+                    class="p-1.5 font-bold text-purple-400 flex items-center gap-1.5"
+                  >
+                    <span class="w-2 h-2 rounded-full bg-purple-500"></span> P4
+                  </td>
+                  <td class="p-1.5">3 ms</td>
+                  <td class="p-1.5">5 ms</td>
+                  <td class="p-1.5 text-slate-500">3</td>
+                </tr>
+                <tr class="hover:bg-slate-800/30">
+                  <td
+                    class="p-1.5 font-bold text-pink-400 flex items-center gap-1.5"
+                  >
+                    <span class="w-2 h-2 rounded-full bg-pink-500"></span> P5
+                  </td>
+                  <td class="p-1.5">4 ms</td>
+                  <td class="p-1.5">2 ms</td>
+                  <td class="p-1.5 text-slate-500">5</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Gantt Chart Timeline -->
+          <div class="space-y-1">
+            <div
+              class="flex justify-between items-center text-[11px] text-slate-400 font-semibold mb-1"
+            >
+              <span>Diagrama de Gantt (Ordenado por Ráfaga más Corta)</span>
+              <span class="code-font text-emerald-400">Total: 15ms</span>
+            </div>
+
+            <div class="overflow-x-auto custom-scrollbar pb-2">
+              <div class="w-[480px]">
+                <!-- Time Axis Header -->
+                <div
+                  class="flex text-[10px] code-font text-slate-500 border-b border-slate-800 pb-1 mb-1"
+                >
+                  <div style="width: 26.66%" class="text-left">0</div>
+                  <div style="width: 6.66%" class="text-left">4</div>
+                  <div style="width: 13.33%" class="text-left">5</div>
+                  <div style="width: 20%" class="text-left">7</div>
+                  <div style="width: 33.33%" class="text-left">10</div>
+                  <div class="text-right">15</div>
+                </div>
+
+                <!-- Gantt Timeline Track -->
+                <div
+                  class="h-9 bg-slate-950/80 rounded-lg border border-slate-800 p-1 flex relative timeline-grid items-center"
+                >
+                  <!-- Block P1 (0 - 4) -->
+                  <div
+                    class="gantt-block h-full bg-blue-600/90 border border-blue-400/50 rounded text-[10px] font-bold text-white flex items-center justify-center cursor-pointer shadow-sm code-font"
+                    style="width: 26.66%"
+                    data-pid="P1"
+                    data-start="0"
+                    data-end="4"
+                    data-duration="4 ms"
+                    data-status="Ejecutado primero (En CPU)"
+                    data-color="blue"
+                  >
+                    P1 (4ms)
+                  </div>
+                  <!-- Block P3 (4 - 5) -> BT más corto disponible = 1ms -->
+                  <div
+                    class="gantt-block h-full bg-amber-600/90 border border-amber-400/50 rounded text-[10px] font-bold text-white flex items-center justify-center cursor-pointer shadow-sm code-font"
+                    style="width: 6.66%"
+                    data-pid="P3"
+                    data-start="4"
+                    data-end="5"
+                    data-duration="1 ms"
+                    data-status="Priorizado por BT=1ms"
+                    data-color="amber"
+                  >
+                    P3
+                  </div>
+                  <!-- Block P5 (5 - 7) -> BT = 2ms -->
+                  <div
+                    class="gantt-block h-full bg-pink-600/90 border border-pink-400/50 rounded text-[10px] font-bold text-white flex items-center justify-center cursor-pointer shadow-sm code-font"
+                    style="width: 13.33%"
+                    data-pid="P5"
+                    data-start="5"
+                    data-end="7"
+                    data-duration="2 ms"
+                    data-status="Priorizado por BT=2ms"
+                    data-color="pink"
+                  >
+                    P5 (2ms)
+                  </div>
+                  <!-- Block P2 (7 - 10) -> BT = 3ms -->
+                  <div
+                    class="gantt-block h-full bg-emerald-600/90 border border-emerald-400/50 rounded text-[10px] font-bold text-white flex items-center justify-center cursor-pointer shadow-sm code-font"
+                    style="width: 20%"
+                    data-pid="P2"
+                    data-start="7"
+                    data-end="10"
+                    data-duration="3 ms"
+                    data-status="Priorizado por BT=3ms"
+                    data-color="emerald"
+                  >
+                    P2 (3ms)
+                  </div>
+                  <!-- Block P4 (10 - 15) -> BT = 5ms -->
+                  <div
+                    class="gantt-block h-full bg-purple-600/90 border border-purple-400/50 rounded text-[10px] font-bold text-white flex items-center justify-center cursor-pointer shadow-sm code-font"
+                    style="width: 33.33%"
+                    data-pid="P4"
+                    data-start="10"
+                    data-end="15"
+                    data-duration="5 ms"
+                    data-status="Ejecutado al final BT=5ms"
+                    data-color="purple"
+                  >
+                    P4 (5ms)
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer Metrics Summary -->
+        <div
+          class="p-2.5 bg-slate-900 border-t border-slate-800 grid grid-cols-3 gap-2 text-[11px] code-font"
+        >
+          <div
+            class="bg-slate-950/60 p-1.5 rounded border border-slate-800 text-center"
+          >
+            <span class="text-slate-400 text-[10px] block font-sans"
+              >Espera Prom. (WT)</span
+            >
+            <span class="font-bold text-emerald-400">3.20 ms</span>
+          </div>
+          <div
+            class="bg-slate-950/60 p-1.5 rounded border border-slate-800 text-center"
+          >
+            <span class="text-slate-400 text-[10px] block font-sans"
+              >Retorno Prom. (TAT)</span
+            >
+            <span class="font-bold text-emerald-400">6.20 ms</span>
+          </div>
+          <div
+            class="bg-slate-950/60 p-1.5 rounded border border-slate-800 text-center"
+          >
+            <span class="text-slate-400 text-[10px] block font-sans"
+              >Uso de CPU</span
+            >
+            <span class="font-bold text-emerald-400">100.0%</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= ESQUINA INFERIOR IZQUIERDA: 3. SRTF / SRT ================= -->
+      <section
+        class="bg-slate-900/80 rounded-2xl border border-amber-500/30 flex flex-col overflow-hidden shadow-2xl glow-amber hover:border-amber-500/60 transition"
+      >
+        <!-- Header -->
+        <div
+          class="p-3 bg-slate-900 border-b border-slate-800 flex justify-between items-center flex-wrap gap-2"
+        >
+          <div class="flex items-center gap-2.5">
+            <span
+              class="w-3 h-3 rounded-full bg-amber-400 shadow-sm shadow-amber-400/80"
+            ></span>
+            <div>
+              <h2
+                class="font-bold text-sm text-amber-300 flex items-center gap-2"
+              >
+                3. SRTF / SRT
+                <span
+                  class="text-[10px] font-semibold code-font px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700"
+                  >Shortest Remaining Time First</span
+                >
+              </h2>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span
+              class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-rose-500/10 text-rose-400 border border-rose-500/30 flex items-center gap-1 animate-pulse"
+            >
+              <i data-lucide="zap" class="w-2.5 h-2.5"></i> Expulsivo
+            </span>
+            <button
+              class="text-slate-400 hover:text-white p-1 rounded hover:bg-slate-800"
+              title="Expandir"
+            >
+              <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-3">
+          <!-- Mini Processes Table -->
+          <div
+            class="overflow-x-auto rounded-lg border border-slate-800 bg-slate-950/50"
+          >
+            <table class="w-full text-left text-[11px] code-font">
+              <thead
+                class="bg-slate-800/60 text-slate-400 border-b border-slate-800"
+              >
+                <tr>
+                  <th class="p-1.5 font-semibold">PID</th>
+                  <th class="p-1.5 font-semibold">Llegada (AT)</th>
+                  <th class="p-1.5 font-semibold">Ráfaga (BT)</th>
+                  <th class="p-1.5 font-semibold">Prioridad</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800/50 text-slate-300">
+                <tr class="hover:bg-slate-800/30">
+                  <td
+                    class="p-1.5 font-bold text-blue-400 flex items-center gap-1.5"
+                  >
+                    <span class="w-2 h-2 rounded-full bg-blue-500"></span> P1
+                  </td>
+                  <td class="p-1.5">0 ms</td>
+                  <td class="p-1.5">4 ms</td>
+                  <td class="p-1.5 text-slate-500">2</td>
+                </tr>
+                <tr class="hover:bg-slate-800/30">
+                  <td
+                    class="p-1.5 font-bold text-emerald-400 flex items-center gap-1.5"
+                  >
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span> P2
+                  </td>
+                  <td class="p-1.5">1 ms</td>
+                  <td class="p-1.5">3 ms</td>
+                  <td class="p-1.5 text-slate-500">1</td>
+                </tr>
+                <tr class="hover:bg-slate-800/30">
+                  <td
+                    class="p-1.5 font-bold text-amber-400 flex items-center gap-1.5"
+                  >
+                    <span class="w-2 h-2 rounded-full bg-amber-500"></span> P3
+                  </td>
+                  <td class="p-1.5">2 ms</td>
+                  <td class="p-1.5">1 ms</td>
+                  <td class="p-1.5 text-slate-500">4</td>
+                </tr>
+                <tr class="hover:bg-slate-800/30">
+                  <td
+                    class="p-1.5 font-bold text-purple-400 flex items-center gap-1.5"
+                  >
+                    <span class="w-2 h-2 rounded-full bg-purple-500"></span> P4
+                  </td>
+                  <td class="p-1.5">3 ms</td>
+                  <td class="p-1.5">5 ms</td>
+                  <td class="p-1.5 text-slate-500">3</td>
+                </tr>
+                <tr class="hover:bg-slate-800/30">
+                  <td
+                    class="p-1.5 font-bold text-pink-400 flex items-center gap-1.5"
+                  >
+                    <span class="w-2 h-2 rounded-full bg-pink-500"></span> P5
+                  </td>
+                  <td class="p-1.5">4 ms</td>
+                  <td class="p-1.5">2 ms</td>
+                  <td class="p-1.5 text-slate-500">5</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Gantt Chart Timeline (Preemptive fragments) -->
+          <div class="space-y-1">
+            <div
+              class="flex justify-between items-center text-[11px] text-slate-400 font-semibold mb-1"
+            >
+              <span>Diagrama de Gantt (Con Interrupciones / Expulsión)</span>
+              <span class="code-font text-amber-400">Total: 15ms</span>
+            </div>
+
+            <div class="overflow-x-auto custom-scrollbar pb-2">
+              <div class="w-[480px]">
+                <!-- Time Axis Header -->
+                <div
+                  class="flex text-[10px] code-font text-slate-500 border-b border-slate-800 pb-1 mb-1"
+                >
+                  <div style="width: 6.66%" class="text-left">0</div>
+                  <div style="width: 6.66%" class="text-left">1</div>
+                  <div style="width: 6.66%" class="text-left">2</div>
+                  <div style="width: 13.33%" class="text-left">3</div>
+                  <div style="width: 13.33%" class="text-left">5</div>
+                  <div style="width: 20%" class="text-left">7</div>
+                  <div style="width: 33.33%" class="text-left">10</div>
+                  <div class="text-right">15</div>
+                </div>
+
+                <!-- Gantt Timeline Track -->
+                <div
+                  class="h-9 bg-slate-950/80 rounded-lg border border-slate-800 p-1 flex relative timeline-grid items-center gap-0.5"
+                >
+                  <!-- P1 Fragment 1 (0 - 1) -->
+                  <div
+                    class="gantt-block h-full bg-blue-600/90 border border-blue-400/50 rounded text-[9px] font-bold text-white flex items-center justify-center cursor-pointer shadow-sm code-font"
+                    style="width: 6.66%"
+                    data-pid="P1 (Part 1)"
+                    data-start="0"
+                    data-end="1"
+                    data-duration="1 ms"
+                    data-status="Interrumpido por P2 (Expulsión)"
+                    data-color="blue"
+                  >
+                    P1
+                  </div>
+                  <!-- P2 Fragment 1 (1 - 2) -->
+                  <div
+                    class="gantt-block h-full bg-emerald-600/90 border border-emerald-400/50 rounded text-[9px] font-bold text-white flex items-center justify-center cursor-pointer shadow-sm code-font"
+                    style="width: 6.66%"
+                    data-pid="P2 (Part 1)"
+                    data-start="1"
+                    data-end="2"
+                    data-duration="1 ms"
+                    data-status="Interrumpido por P3 (Llegó BT=1)"
+                    data-color="emerald"
+                  >
+                    P2
+                  </div>
+                  <!-- P3 Full execution (2 - 3) -->
+                  <div
+                    class="gantt-block h-full bg-amber-600/90 border border-amber-400/50 rounded text-[9px] font-bold text-white flex items-center justify-center cursor-pointer shadow-sm code-font"
+                    style="width: 6.66%"
+                    data-pid="P3"
+                    data-start="2"
+                    data-end="3"
+                    data-duration="1 ms"
+                    data-status="Completado sin interrupción"
+                    data-color="amber"
+                  >
+                    P3
+                  </div>
+                  <!-- P2 Resume & Finish (3 - 5) -->
+                  <div
+                    class="gantt-block h-full bg-emerald-600/90 border border-emerald-400/50 rounded text-[9px] font-bold text-white flex items-center justify-center cursor-pointer shadow-sm code-font"
+                    style="width: 13.33%"
+                    data-pid="P2 (Part 2)"
+                    data-start="3"
+                    data-end="5"
+                    data-duration="2 ms"
+                    data-status="Continuación y finalización P2"
+                    data-color="emerald"
+                  >
+                    P2 (2ms)
+                  </div>
+                  <!-- P5 Execution (5 - 7) -->
+                  <div
+                    class="gantt-block h-full bg-pink-600/90 border border-pink-400/50 rounded text-[9px] font-bold text-white flex items-center justify-center cursor-pointer shadow-sm code-font"
+                    style="width: 13.33%"
+                    data-pid="P5"
+                    data-start="5"
+                    data-end="7"
+                    data-duration="2 ms"
+                    data-status="Ejecutado por tiempo restante menor"
+                    data-color="pink"
+                  >
+                    P5 (2ms)
+                  </div>
+                  <!-- P1 Resume & Finish (7 - 10) -->
+                  <div
+                    class="gantt-block h-full bg-blue-600/90 border border-blue-400/50 rounded text-[9px] font-bold text-white flex items-center justify-center cursor-pointer shadow-sm code-font"
+                    style="width: 20%"
+                    data-pid="P1 (Part 2)"
+                    data-start="7"
+                    data-end="10"
+                    data-duration="3 ms"
+                    data-status="Finalización restante de P1 (3ms)"
+                    data-color="blue"
+                  >
+                    P1 (3ms)
+                  </div>
+                  <!-- P4 Final execution (10 - 15) -->
+                  <div
+                    class="gantt-block h-full bg-purple-600/90 border border-purple-400/50 rounded text-[9px] font-bold text-white flex items-center justify-center cursor-pointer shadow-sm code-font"
+                    style="width: 33.33%"
+                    data-pid="P4"
+                    data-start="10"
+                    data-end="15"
+                    data-duration="5 ms"
+                    data-status="Ejecución final de P4"
+                    data-color="purple"
+                  >
+                    P4 (5ms)
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer Metrics Summary -->
+        <div
+          class="p-2.5 bg-slate-900 border-t border-slate-800 grid grid-cols-3 gap-2 text-[11px] code-font"
+        >
+          <div
+            class="bg-slate-950/60 p-1.5 rounded border border-slate-800 text-center"
+          >
+            <span class="text-slate-400 text-[10px] block font-sans"
+              >Espera Prom. (WT)</span
+            >
+            <span class="font-bold text-amber-400">2.60 ms</span>
+          </div>
+          <div
+            class="bg-slate-950/60 p-1.5 rounded border border-slate-800 text-center"
+          >
+            <span class="text-slate-400 text-[10px] block font-sans"
+              >Retorno Prom. (TAT)</span
+            >
+            <span class="font-bold text-amber-400">5.60 ms</span>
+          </div>
+          <div
+            class="bg-slate-950/60 p-1.5 rounded border border-slate-800 text-center"
+          >
+            <span class="text-slate-400 text-[10px] block font-sans"
+              >Uso de CPU</span
+            >
+            <span class="font-bold text-emerald-400">100.0%</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= ESQUINA INFERIOR DERECHA: 4. ROUND ROBIN (RR) ================= -->
+      <section
+        class="bg-slate-900/80 rounded-2xl border border-purple-500/30 flex flex-col overflow-hidden shadow-2xl glow-purple hover:border-purple-500/60 transition"
+      >
+        <!-- Header with Quantum Input -->
+        <div
+          class="p-3 bg-slate-900 border-b border-slate-800 flex justify-between items-center flex-wrap gap-2"
+        >
+          <div class="flex items-center gap-2.5">
+            <span
+              class="w-3 h-3 rounded-full bg-purple-400 shadow-sm shadow-purple-400/80"
+            ></span>
+            <div>
+              <h2
+                class="font-bold text-sm text-purple-300 flex items-center gap-2"
+              >
+                4. Round Robin (RR)
+                <span
+                  class="text-[10px] font-semibold code-font px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700"
+                  >Time Slicing</span
+                >
+              </h2>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <!-- Quantum Configuration Control -->
+            <div
+              class="flex items-center bg-slate-950 border border-purple-500/40 rounded-lg px-2 py-0.5 text-xs"
+            >
+              <label
+                for="quantum-input"
+                class="text-[11px] code-font text-purple-300 font-semibold mr-1.5"
+                >q =</label
+              >
+              <input
+                id="quantum-input"
+                type="number"
+                min="1"
+                max="10"
+                value="2"
+                class="w-9 bg-slate-800 text-center text-white font-bold rounded border border-slate-700 py-0.5 text-xs focus:outline-none focus:border-purple-400 code-font"
+              />
+              <span class="text-[10px] text-slate-400 ml-1">ms</span>
+            </div>
+
+            <span
+              class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-rose-500/10 text-rose-400 border border-rose-500/30 flex items-center gap-1 animate-pulse"
+            >
+              <i data-lucide="zap" class="w-2.5 h-2.5"></i> Expulsivo
+            </span>
+            <button
+              class="text-slate-400 hover:text-white p-1 rounded hover:bg-slate-800"
+              title="Expandir"
+            >
+              <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-3">
+          <!-- Mini Processes Table -->
+          <div
+            class="overflow-x-auto rounded-lg border border-slate-800 bg-slate-950/50"
+          >
+            <table class="w-full text-left text-[11px] code-font">
+              <thead
+                class="bg-slate-800/60 text-slate-400 border-b border-slate-800"
+              >
+                <tr>
+                  <th class="p-1.5 font-semibold">PID</th>
+                  <th class="p-1.5 font-semibold">Llegada (AT)</th>
+                  <th class="p-1.5 font-semibold">Ráfaga (BT)</th>
+                  <th class="p-1.5 font-semibold">Prioridad</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800/50 text-slate-300">
+                <tr class="hover:bg-slate-800/30">
+                  <td
+                    class="p-1.5 font-bold text-blue-400 flex items-center gap-1.5"
+                  >
+                    <span class="w-2 h-2 rounded-full bg-blue-500"></span> P1
+                  </td>
+                  <td class="p-1.5">0 ms</td>
+                  <td class="p-1.5">4 ms</td>
+                  <td class="p-1.5 text-slate-500">2</td>
+                </tr>
+                <tr class="hover:bg-slate-800/30">
+                  <td
+                    class="p-1.5 font-bold text-emerald-400 flex items-center gap-1.5"
+                  >
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span> P2
+                  </td>
+                  <td class="p-1.5">1 ms</td>
+                  <td class="p-1.5">3 ms</td>
+                  <td class="p-1.5 text-slate-500">1</td>
+                </tr>
+                <tr class="hover:bg-slate-800/30">
+                  <td
+                    class="p-1.5 font-bold text-amber-400 flex items-center gap-1.5"
+                  >
+                    <span class="w-2 h-2 rounded-full bg-amber-500"></span> P3
+                  </td>
+                  <td class="p-1.5">2 ms</td>
+                  <td class="p-1.5">1 ms</td>
+                  <td class="p-1.5 text-slate-500">4</td>
+                </tr>
+                <tr class="hover:bg-slate-800/30">
+                  <td
+                    class="p-1.5 font-bold text-purple-400 flex items-center gap-1.5"
+                  >
+                    <span class="w-2 h-2 rounded-full bg-purple-500"></span> P4
+                  </td>
+                  <td class="p-1.5">3 ms</td>
+                  <td class="p-1.5">5 ms</td>
+                  <td class="p-1.5 text-slate-500">3</td>
+                </tr>
+                <tr class="hover:bg-slate-800/30">
+                  <td
+                    class="p-1.5 font-bold text-pink-400 flex items-center gap-1.5"
+                  >
+                    <span class="w-2 h-2 rounded-full bg-pink-500"></span> P5
+                  </td>
+                  <td class="p-1.5">4 ms</td>
+                  <td class="p-1.5">2 ms</td>
+                  <td class="p-1.5 text-slate-500">5</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Gantt Chart Timeline (Sliced Time Quantum q=2) -->
+          <div class="space-y-1">
+            <div
+              class="flex justify-between items-center text-[11px] text-slate-400 font-semibold mb-1"
+            >
+              <span>Diagrama de Gantt por Quantum (q = 2 ms)</span>
+              <span class="code-font text-purple-400">Total: 15ms</span>
+            </div>
+
+            <div class="overflow-x-auto custom-scrollbar pb-2">
+              <div class="w-[520px]">
+                <!-- Time Axis Header -->
+                <div
+                  class="flex text-[9px] code-font text-slate-500 border-b border-slate-800 pb-1 mb-1"
+                >
+                  <div style="width: 13.3%" class="text-left">0</div>
+                  <div style="width: 13.3%" class="text-left">2</div>
+                  <div style="width: 6.6%" class="text-left">4</div>
+                  <div style="width: 13.3%" class="text-left">5</div>
+                  <div style="width: 13.3%" class="text-left">7</div>
+                  <div style="width: 13.3%" class="text-left">9</div>
+                  <div style="width: 6.6%" class="text-left">11</div>
+                  <div style="width: 13.3%" class="text-left">12</div>
+                  <div class="text-right">15</div>
+                </div>
+
+                <!-- Gantt Timeline Track -->
+                <div
+                  class="h-9 bg-slate-950/80 rounded-lg border border-slate-800 p-1 flex relative timeline-grid items-center gap-0.5"
+                >
+                  <!-- P1 (0 - 2) q=2 -->
+                  <div
+                    class="gantt-block h-full bg-blue-600/90 border border-blue-400/50 rounded text-[9px] font-bold text-white flex items-center justify-center cursor-pointer shadow-sm code-font"
+                    style="width: 13.3%"
+                    data-pid="P1 (Turno 1)"
+                    data-start="0"
+                    data-end="2"
+                    data-duration="2 ms (Quantum)"
+                    data-status="Turno cedido por expiración de quantum"
+                    data-color="blue"
+                  >
+                    P1
+                  </div>
+                  <!-- P2 (2 - 4) q=2 -->
+                  <div
+                    class="gantt-block h-full bg-emerald-600/90 border border-emerald-400/50 rounded text-[9px] font-bold text-white flex items-center justify-center cursor-pointer shadow-sm code-font"
+                    style="width: 13.3%"
+                    data-pid="P2 (Turno 1)"
+                    data-start="2"
+                    data-end="4"
+                    data-duration="2 ms (Quantum)"
+                    data-status="Turno cedido por expiración de quantum"
+                    data-color="emerald"
+                  >
+                    P2
+                  </div>
+                  <!-- P3 (4 - 5) q=1 finishes -->
+                  <div
+                    class="gantt-block h-full bg-amber-600/90 border border-amber-400/50 rounded text-[9px] font-bold text-white flex items-center justify-center cursor-pointer shadow-sm code-font"
+                    style="width: 6.6%"
+                    data-pid="P3"
+                    data-start="4"
+                    data-end="5"
+                    data-duration="1 ms"
+                    data-status="Finalizado antes del fin del quantum"
+                    data-color="amber"
+                  >
+                    P3
+                  </div>
+                  <!-- P4 (5 - 7) q=2 -->
+                  <div
+                    class="gantt-block h-full bg-purple-600/90 border border-purple-400/50 rounded text-[9px] font-bold text-white flex items-center justify-center cursor-pointer shadow-sm code-font"
+                    style="width: 13.3%"
+                    data-pid="P4 (Turno 1)"
+                    data-start="5"
+                    data-end="7"
+                    data-duration="2 ms (Quantum)"
+                    data-status="Quantum terminado -> Cola de listos"
+                    data-color="purple"
+                  >
+                    P4
+                  </div>
+                  <!-- P5 (7 - 9) q=2 finishes -->
+                  <div
+                    class="gantt-block h-full bg-pink-600/90 border border-pink-400/50 rounded text-[9px] font-bold text-white flex items-center justify-center cursor-pointer shadow-sm code-font"
+                    style="width: 13.3%"
+                    data-pid="P5"
+                    data-start="7"
+                    data-end="9"
+                    data-duration="2 ms"
+                    data-status="Finalizado completamente"
+                    data-color="pink"
+                  >
+                    P5
+                  </div>
+                  <!-- P1 (9 - 11) q=2 finishes -->
+                  <div
+                    class="gantt-block h-full bg-blue-600/90 border border-blue-400/50 rounded text-[9px] font-bold text-white flex items-center justify-center cursor-pointer shadow-sm code-font"
+                    style="width: 13.3%"
+                    data-pid="P1 (Turno 2)"
+                    data-start="9"
+                    data-end="11"
+                    data-duration="2 ms"
+                    data-status="Finalizado completamente"
+                    data-color="blue"
+                  >
+                    P1
+                  </div>
+                  <!-- P2 (11 - 12) q=1 finishes -->
+                  <div
+                    class="gantt-block h-full bg-emerald-600/90 border border-emerald-400/50 rounded text-[9px] font-bold text-white flex items-center justify-center cursor-pointer shadow-sm code-font"
+                    style="width: 6.6%"
+                    data-pid="P2 (Turno 2)"
+                    data-start="11"
+                    data-end="12"
+                    data-duration="1 ms"
+                    data-status="Finalizado completamente"
+                    data-color="emerald"
+                  >
+                    P2
+                  </div>
+                  <!-- P4 (12 - 15) q=3 remaining -->
+                  <div
+                    class="gantt-block h-full bg-purple-600/90 border border-purple-400/50 rounded text-[9px] font-bold text-white flex items-center justify-center cursor-pointer shadow-sm code-font"
+                    style="width: 20%"
+                    data-pid="P4 (Turno 2)"
+                    data-start="12"
+                    data-end="15"
+                    data-duration="3 ms"
+                    data-status="Finalizado (Último en cola)"
+                    data-color="purple"
+                  >
+                    P4 (3ms)
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer Metrics Summary -->
+        <div
+          class="p-2.5 bg-slate-900 border-t border-slate-800 grid grid-cols-3 gap-2 text-[11px] code-font"
+        >
+          <div
+            class="bg-slate-950/60 p-1.5 rounded border border-slate-800 text-center"
+          >
+            <span class="text-slate-400 text-[10px] block font-sans"
+              >Espera Prom. (WT)</span
+            >
+            <span class="font-bold text-purple-400">5.60 ms</span>
+          </div>
+          <div
+            class="bg-slate-950/60 p-1.5 rounded border border-slate-800 text-center"
+          >
+            <span class="text-slate-400 text-[10px] block font-sans"
+              >Retorno Prom. (TAT)</span
+            >
+            <span class="font-bold text-purple-400">8.60 ms</span>
+          </div>
+          <div
+            class="bg-slate-950/60 p-1.5 rounded border border-slate-800 text-center"
+          >
+            <span class="text-slate-400 text-[10px] block font-sans"
+              >Uso de CPU</span
+            >
+            <span class="font-bold text-emerald-400">100.0%</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div
+      id="process-tooltip"
+      class="fixed opacity-0 pointer-events-none bg-slate-900 text-slate-100 text-xs rounded-xl p-3 shadow-2xl border border-slate-700 space-y-1.5 backdrop-blur-md code-font"
+    >
+      <div
+        id="tooltip-pid"
+        class="font-bold text-sm text-cyan-400 border-b border-slate-800 pb-1 flex items-center justify-between gap-4"
+      >
+        <span>PROCESO</span>
+        <span
+          id="tooltip-badge"
+          class="text-[9px] font-normal px-2 py-0.5 rounded bg-slate-800 text-slate-300"
+        ></span>
+      </div>
+      <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-slate-300">
+        <div class="text-slate-400">
+          Inicio (t<sub>1</sub>):
+          <span id="tooltip-start" class="text-white font-semibold"></span>
+        </div>
+        <div class="text-slate-400">
+          Fin (t<sub>2</sub>):
+          <span id="tooltip-end" class="text-white font-semibold"></span>
+        </div>
+        <div class="text-slate-400 col-span-2">
+          Duración:
+          <span
+            id="tooltip-duration"
+            class="text-emerald-400 font-semibold"
+          ></span>
+        </div>
+      </div>
+      <div
+        class="text-[10px] text-slate-400 pt-1 border-t border-slate-800/80 font-sans italic"
+        id="tooltip-status"
+      ></div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Tooltip interactivity setup
+        const tooltip = document.getElementById("process-tooltip");
+        const tooltipPid = document
+          .getElementById("tooltip-pid")
+          .querySelector("span");
+        const tooltipStart = document.getElementById("tooltip-start");
+        const tooltipEnd = document.getElementById("tooltip-end");
+        const tooltipDuration = document.getElementById("tooltip-duration");
+        const tooltipStatus = document.getElementById("tooltip-status");
+        const tooltipBadge = document.getElementById("tooltip-badge");
+
+        const ganttBlocks = document.querySelectorAll(".gantt-block");
+
+        ganttBlocks.forEach((block) => {
+          block.addEventListener("mouseenter", (e) => {
+            const pid = block.getAttribute("data-pid");
+            const start = block.getAttribute("data-start");
+            const end = block.getAttribute("data-end");
+            const duration = block.getAttribute("data-duration");
+            const status = block.getAttribute("data-status");
+            const color = block.getAttribute("data-color");
+
+            tooltipPid.textContent = `Proceso: ${pid}`;
+            tooltipStart.textContent = `${start} ms`;
+            tooltipEnd.textContent = `${end} ms`;
+            tooltipDuration.textContent = duration;
+            tooltipStatus.textContent = status;
+            tooltipBadge.textContent = color.toUpperCase();
+
+            tooltip.classList.remove("opacity-0");
+            tooltip.classList.add("opacity-100");
+          });
+
+          block.addEventListener("mousemove", (e) => {
+            const x = e.clientX + 14;
+            const y = e.clientY + 14;
+
+            const bounds = tooltip.getBoundingClientRect();
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+
+            let adjustedX = x;
+            let adjustedY = y;
+
+            if (x + bounds.width > windowWidth) {
+              adjustedX = e.clientX - bounds.width - 10;
+            }
+            if (y + bounds.height > windowHeight) {
+              adjustedY = e.clientY - bounds.height - 10;
+            }
+
+            tooltip.style.left = `${adjustedX}px`;
+            tooltip.style.top = `${adjustedY}px`;
+          });
+
+          block.addEventListener("mouseleave", () => {
+            tooltip.classList.remove("opacity-100");
+            tooltip.classList.add("opacity-0");
+          });
+        });
+
+        // Decorative Quantum Input feedback
+        const quantumInput = document.getElementById("quantum-input");
+        if (quantumInput) {
+          quantumInput.addEventListener("change", (e) => {
+            const val = e.target.value;
+            console.log(`Quantum configurado a: ${val} ms`);
+          });
+        }
+
+        // Global buttons event handling (Mock actions)
+        document.getElementById("btn-run").addEventListener("click", () => {
+          const btn = document.getElementById("btn-run");
+          btn.classList.add("opacity-75");
+          btn.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i> Simulando...`;
+          lucide.createIcons();
+
+          setTimeout(() => {
+            btn.classList.remove("opacity-75");
+            btn.innerHTML = `<i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i> Simular Todo`;
+            lucide.createIcons();
+          }, 700);
+        });
+
+        document.getElementById("btn-reset").addEventListener("click", () => {
+          const btn = document.getElementById("btn-reset");
+          btn.classList.add("animate-spin");
+          setTimeout(() => {
+            btn.classList.remove("animate-spin");
+          }, 500);
+        });
+
+        document
+          .getElementById("btn-add-process")
+          .addEventListener("click", () => {
+            const btn = document.getElementById("btn-add-process");
+            btn.classList.add("scale-95");
+            setTimeout(() => btn.classList.remove("scale-95"), 150);
+          });
+      });
+    </script>
+  </body>
+</html>
