@@ -1,0 +1,314 @@
+[
+  {
+    "id": "1716",
+    "nombre": "MsMpEng.exe",
+    "llegada": 0,
+    "rafaga": 50
+  },
+  {
+    "id": "1220",
+    "nombre": "msedge.exe",
+    "llegada": 0,
+    "rafaga": 35
+  },
+  {
+    "id": "1996",
+    "nombre": "chrome.exe",
+    "llegada": 0,
+    "rafaga": 32
+  },
+  {
+    "id": "1368",
+    "nombre": "svchost.exe",
+    "llegada": 2,
+    "rafaga": 1
+  },
+  {
+    "id": "2820",
+    "nombre": "conhost.exe",
+    "llegada": 2,
+    "rafaga": 1
+  },
+  {
+    "id": "2848",
+    "nombre": "RuntimeBroker.exe",
+    "llegada": 3,
+    "rafaga": 1
+  },
+  {
+    "id": "2612",
+    "nombre": "ApplicationFrameHost.exe",
+    "llegada": 3,
+    "rafaga": 2
+  },
+  {
+    "id": "164",
+    "nombre": "svchost.exe",
+    "llegada": 4,
+    "rafaga": 1
+  },
+  {
+    "id": "64",
+    "nombre": "vlc.exe",
+    "llegada": 4,
+    "rafaga": 1
+  },
+  {
+    "id": "2892",
+    "nombre": "RuntimeBroker.exe",
+    "llegada": 5,
+    "rafaga": 2
+  },
+  {
+    "id": "1840",
+    "nombre": "svchost.exe",
+    "llegada": 6,
+    "rafaga": 1
+  },
+  {
+    "id": "2008",
+    "nombre": "Teams.exe",
+    "llegada": 6,
+    "rafaga": 1
+  },
+  {
+    "id": "2716",
+    "nombre": "SnippingTool.exe",
+    "llegada": 7,
+    "rafaga": 1
+  },
+  {
+    "id": "1052",
+    "nombre": "svchost.exe",
+    "llegada": 8,
+    "rafaga": 1
+  },
+  {
+    "id": "1692",
+    "nombre": "msteams.exe",
+    "llegada": 8,
+    "rafaga": 1
+  },
+  {
+    "id": "992",
+    "nombre": "svchost.exe",
+    "llegada": 9,
+    "rafaga": 1
+  },
+  {
+    "id": "252",
+    "nombre": "svchost.exe",
+    "llegada": 10,
+    "rafaga": 1
+  },
+  {
+    "id": "2800",
+    "nombre": "zoom.exe",
+    "llegada": 11,
+    "rafaga": 1
+  },
+  {
+    "id": "3152",
+    "nombre": "svchost.exe",
+    "llegada": 12,
+    "rafaga": 1
+  },
+  {
+    "id": "984",
+    "nombre": "conhost.exe",
+    "llegada": 13,
+    "rafaga": 1
+  },
+  {
+    "id": "1544",
+    "nombre": "svchost.exe",
+    "llegada": 14,
+    "rafaga": 1
+  },
+  {
+    "id": "2476",
+    "nombre": "RtkAudUService64.exe",
+    "llegada": 15,
+    "rafaga": 1
+  },
+  {
+    "id": "316",
+    "nombre": "System Idle Process",
+    "llegada": 16,
+    "rafaga": 2
+  },
+  {
+    "id": "1564",
+    "nombre": "winlogon.exe",
+    "llegada": 17,
+    "rafaga": 2
+  },
+  {
+    "id": "2652",
+    "nombre": "smss.exe",
+    "llegada": 18,
+    "rafaga": 2
+  },
+  {
+    "id": "1940",
+    "nombre": "RuntimeBroker.exe",
+    "llegada": 19,
+    "rafaga": 1
+  },
+  {
+    "id": "2320",
+    "nombre": "conhost.exe",
+    "llegada": 20,
+    "rafaga": 1
+  },
+  {
+    "id": "2644",
+    "nombre": "Registry",
+    "llegada": 21,
+    "rafaga": 1
+  },
+  {
+    "id": "3512",
+    "nombre": "svchost.exe",
+    "llegada": 22,
+    "rafaga": 1
+  },
+  {
+    "id": "3652",
+    "nombre": "conhost.exe",
+    "llegada": 23,
+    "rafaga": 1
+  },
+  {
+    "id": "3540",
+    "nombre": "SecurityHealthService.exe",
+    "llegada": 24,
+    "rafaga": 2
+  },
+  {
+    "id": "3548",
+    "nombre": "conhost.exe",
+    "llegada": 25,
+    "rafaga": 2
+  },
+  {
+    "id": "4224",
+    "nombre": "RuntimeBroker.exe",
+    "llegada": 26,
+    "rafaga": 1
+  },
+  {
+    "id": "3420",
+    "nombre": "TextInputHost.exe",
+    "llegada": 27,
+    "rafaga": 1
+  },
+  {
+    "id": "3640",
+    "nombre": "svchost.exe",
+    "llegada": 28,
+    "rafaga": 2
+  },
+  {
+    "id": "3772",
+    "nombre": "wsappx",
+    "llegada": 29,
+    "rafaga": 1
+  },
+  {
+    "id": "4444",
+    "nombre": "dllhost.exe",
+    "llegada": 30,
+    "rafaga": 2
+  },
+  {
+    "id": "3820",
+    "nombre": "svchost.exe",
+    "llegada": 31,
+    "rafaga": 1
+  },
+  {
+    "id": "3960",
+    "nombre": "RuntimeBroker.exe",
+    "llegada": 32,
+    "rafaga": 1
+  },
+  {
+    "id": "3828",
+    "nombre": "svchost.exe",
+    "llegada": 33,
+    "rafaga": 1
+  },
+  {
+    "id": "3912",
+    "nombre": "conhost.exe",
+    "llegada": 34,
+    "rafaga": 1
+  },
+  {
+    "id": "3352",
+    "nombre": "svchost.exe",
+    "llegada": 35,
+    "rafaga": 1
+  },
+  {
+    "id": "3972",
+    "nombre": "svchost.exe",
+    "llegada": 36,
+    "rafaga": 2
+  },
+  {
+    "id": "4104",
+    "nombre": "svchost.exe",
+    "llegada": 37,
+    "rafaga": 2
+  },
+  {
+    "id": "3216",
+    "nombre": "svchost.exe",
+    "llegada": 38,
+    "rafaga": 1
+  },
+  {
+    "id": "3608",
+    "nombre": "audiodg.exe",
+    "llegada": 39,
+    "rafaga": 2
+  },
+  {
+    "id": "3412",
+    "nombre": "conhost.exe",
+    "llegada": 40,
+    "rafaga": 2
+  },
+  {
+    "id": "3668",
+    "nombre": "wsappx",
+    "llegada": 41,
+    "rafaga": 2
+  },
+  {
+    "id": "4096",
+    "nombre": "svchost.exe",
+    "llegada": 42,
+    "rafaga": 2
+  },
+  {
+    "id": "4160",
+    "nombre": "svchost.exe",
+    "llegada": 43,
+    "rafaga": 1
+  },
+  {
+    "id": "2896",
+    "nombre": "chrome.exe",
+    "llegada": 45,
+    "rafaga": 27
+  },
+  {
+    "id": "852",
+    "nombre": "chrome.exe",
+    "llegada": 50,
+    "rafaga": 17
+  }
+]

@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Simulador de Planificación de CPU</title>
+<link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="concurrencia.css" />
+</head>
+<body>
+
+<header class="app-header">
+  <div class="app-header__brand">
+    <div id="app-icon" class="app-header__icon">🖥️</div>
+    <div>
+      <h1 id="app-title" class="app-header__title">Simulador de Planificación de CPU</h1>
+      <p id="app-subtitle" class="app-header__subtitle">FCFS · SJF · SRTF · Round Robin — multinúcleo, hilos y lotes grandes (1000+ procesos)</p>
+    </div>
+  </div>
+  <nav class="main-nav">
+    <button id="nav-cpu" class="main-nav__btn active" type="button">🖥️ Planificación de CPU</button>
+    <button id="nav-conc" class="main-nav__btn" type="button">🔀 Simulación de concurrencia</button>
+  </nav>
+</header>
+
+<div id="sec-cpu">
+
+<!-- ===================== GESTIÓN DE PROCESOS ===================== -->
+<section class="panel-card">
+  <div class="panel-card__header">
+    <h2 class="panel-card__title">Cola de entrada <span id="proc-count" class="pill-count code-font">5</span></h2>
+    <div class="toolbar">
+      <input id="proc-search" class="input input--search" placeholder="Buscar por ID o nombre…" />
+      <label class="toolbar" style="gap:6px;color:var(--c-text-dim);font-size:11px;">
+        Orden
+        <select id="sort-select" class="input">
+          <option value="original">Original</option>
+          <option value="original-desc">Original invertido</option>
+          <option value="at-asc">Llegada ↑</option>
+          <option value="at-desc">Llegada ↓</option>
+          <option value="pid-asc">ID ↑</option>
+          <option value="pid-desc">ID ↓</option>
+        </select>
+      </label>
+      <button id="btn-clear-all" class="btn btn--sm btn--danger-ghost">Eliminar todos</button>
+    </div>
+  </div>
+
+  <div class="form-grid">
+    <div class="form-box">
+      <p class="form-box__label">Agregar manualmente</p>
+      <div class="field-row">
+        <input id="f-pid" class="input input--id code-font" placeholder="ID" />
+        <input id="f-name" class="input input--name" placeholder="Nombre (opcional)" />
+        <input id="f-at" type="number" min="0" value="0" class="input input--num code-font" placeholder="Llegada" />
+        <input id="f-bt" type="number" min="1" value="1" class="input input--num code-font" placeholder="T. ejecución" />
+        <input id="f-th" type="number" min="1" max="16" value="1" class="input input--num-sm code-font" placeholder="Hilos" title="Hilos" />
+        <button id="btn-add" class="btn btn--sm btn--add">+ Agregar</button>
+      </div>
+      <p id="add-status" class="status-msg"></p>
+    </div>
+
+    <div class="form-box">
+      <p class="form-box__label">Importar archivo (JSON / CSV)</p>
+      <label class="file-label">
+        Elegir archivo
+        <input id="file-input" type="file" accept=".json,.csv" class="hidden" />
+      </label>
+      <p class="hint">CSV: encabezado <span class="code-font">id,llegada,tiempo_ejecucion</span> (nombre e hilos opcionales). JSON: lista de objetos con esas claves.</p>
+      <p id="import-status" class="status-msg"></p>
+    </div>
+
+    <div class="form-box">
+      <p class="form-box__label">Generador aleatorio</p>
+      <div class="field-row">
+        <input id="r-n" type="number" min="1" max="2000" value="10" class="input input--num-sm code-font" title="Cantidad" />
+        <input id="r-at-max" type="number" min="0" value="20" class="input input--num-sm code-font" title="Llegada máx" />
+        <input id="r-bt-max" type="number" min="1" value="12" class="input input--num-sm code-font" title="T. ejecución máx" />
+        <input id="r-th-max" type="number" min="1" max="16" value="1" class="input input--num-sm code-font" title="Hilos máx" />
+        <button id="btn-random" class="btn btn--sm btn--random">Generar</button>
+      </div>
+      <p class="hint">cantidad · llegada máx · t. ejecución máx · hilos máx (hasta 2000)</p>
+    </div>
+  </div>
+
+  <div id="proc-scroll" class="table-wrap table-wrap--proc custom-scrollbar">
+    <table class="data-table data-table--proc">
+      <thead>
+        <tr><th>ID</th><th>Nombre</th><th>Llegada</th><th>T. ejecución</th><th>Hilos</th><th class="text-right">Acciones</th></tr>
+      </thead>
+      <tbody id="proc-tbody"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===================== CONCURRENCIA ===================== -->
+<section class="panel-card">
+  <div class="panel-card__header">
+    <h2 class="panel-card__title">Concurrencia <span id="cfg-summary" class="pill-count code-font"></span></h2>
+    <div class="toolbar">
+      <label class="cfg-label">Núcleos (CPU)
+        <input id="cfg-cores" type="number" min="1" max="16" value="1" class="input input--num-sm code-font" />
+      </label>
+      <label class="cfg-label"><input id="cfg-threads" type="checkbox" /> Planificar por hilos</label>
+    </div>
+  </div>
+  <p class="hint cfg-hint">Con varios núcleos, cada uno ejecuta un proceso a la vez y todos toman de la misma cola de listos (paralelismo real). Con "por hilos", la ráfaga de cada proceso se reparte en partes iguales entre sus hilos y el planificador asigna hilos, no procesos, a los núcleos: los hilos de un mismo proceso pueden correr al mismo tiempo. Los hilos se ven como P1.h1, P1.h2…</p>
+  <div class="form-box profile-box">
+    <p class="form-box__label">Simular mi CPU (carga baja, muchos procesos)</p>
+    <div class="field-row">
+      <label class="cfg-label">Uso objetivo %
+        <input id="pf-util" type="number" min="1" max="100" value="9" class="input input--num-sm code-font" />
+      </label>
+      <label class="cfg-label">Procesos
+        <input id="pf-n" type="number" min="1" max="2000" value="100" class="input input--num-sm code-font" />
+      </label>
+      <label class="cfg-label" title="Tiempo total durante el cual van llegando los procesos">Ventana (ms)
+        <input id="pf-win" type="number" min="10" value="300" class="input input--num code-font" />
+      </label>
+      <label class="cfg-label">Hilos máx
+        <input id="pf-th" type="number" min="1" max="16" value="4" class="input input--num-sm code-font" />
+      </label>
+      <button id="btn-profile" class="btn btn--sm btn--random">Generar perfil</button>
+    </div>
+    <p class="hint"><strong>Ventana</strong> = el tiempo en el que van llegando los procesos (p. ej. 300 ms). Con el mismo uso objetivo, una ventana más larga significa más trabajo total y procesos más largos; una más corta, llegadas más juntas. Reemplaza la cola de entrada. El uso real aparece en "Uso de CPU".</p>
+    <p id="profile-status" class="status-msg"></p>
+  </div>
+  <div id="thread-legend" class="thread-legend hidden">
+    <span>Hilos de un mismo proceso (mismo color):</span>
+    <span class="thread-legend__item"><span class="thread-legend__sw"></span>h1, h5…</span>
+    <span class="thread-legend__item"><span class="thread-legend__sw thread-1"></span>h2, h6…</span>
+    <span class="thread-legend__item"><span class="thread-legend__sw thread-2"></span>h3, h7…</span>
+    <span class="thread-legend__item"><span class="thread-legend__sw thread-3"></span>h4, h8…</span>
+  </div>
+</section>
+
+<!-- ===================== REPRODUCCIÓN GLOBAL ===================== -->
+<section class="panel-card">
+  <div class="playback-bar">
+    <div class="playback-controls">
+      <button id="btn-step-back" class="btn btn--sm btn--secondary icon-btn">⏮</button>
+      <button id="btn-play" class="btn btn--sm btn--play">▶ Reproducir</button>
+      <button id="btn-step-fwd" class="btn btn--sm btn--secondary icon-btn">⏭</button>
+      <button id="btn-scrub-reset" class="btn btn--sm btn--secondary icon-btn">⟲ Inicio</button>
+    </div>
+    <label class="range-field">Velocidad
+      <input id="speed-range" type="range" min="40" max="1000" step="20" value="740">
+    </label>
+    <label class="range-field">Zoom
+      <input id="zoom-range" type="range" min="3" max="40" step="1" value="16">
+    </label>
+    <span id="cursor-label" class="cursor-label code-font">Instante t = 0 / 0 ms</span>
+  </div>
+</section>
+
+<div class="tabs">
+  <button class="tab-btn active" id="tab-sim">Simulación</button>
+  <button class="tab-btn" id="tab-comp">Comparativa Global</button>
+</div>
+
+<main id="view-sim" class="panels-grid"></main>
+
+<section id="view-comp" class="comp-wrap hidden">
+  <div class="comp-card">
+    <h2 class="comp-card__title">Comparativa de las 4 políticas (mismo lote)</h2>
+    <p id="comp-cfg" class="hint"></p>
+    <div class="table-wrap">
+      <table class="comp-table">
+        <thead><tr><th>Algoritmo</th><th>T.Es Promedio</th><th>T.R Promedio</th><th>Uso de CPU</th></tr></thead>
+        <tbody id="comp-tbody"></tbody>
+      </table>
+    </div>
+    <div id="comp-bars" class="comp-bars"></div>
+  </div>
+</section>
+
+<template id="tpl-panel">
+  <section class="algo-panel">
+    <div class="algo-panel__header">
+      <h2 class="algo-panel__title"><span class="panel-title"></span><span class="algo-panel__subtitle panel-subtitle"></span></h2>
+      <div class="algo-panel__extra panel-extra"></div>
+    </div>
+    <div class="algo-panel__body">
+      <div class="gantt-scroll custom-scrollbar wrap">
+        <div class="gantt-ruler ruler"></div>
+        <div class="gantt-cells cells"></div>
+      </div>
+      <div class="detail-box detail"></div>
+      <details class="detail-toggle">
+        <summary>Ver tabla detallada de procesos</summary>
+        <div class="table-wrap table-wrap--detail custom-scrollbar detail-scroll">
+          <table class="data-table">
+            <thead>
+              <tr><th>Proceso</th><th>T.LL</th><th>T.E</th><th>T.F</th><th>T.R</th><th>T.Es</th></tr>
+            </thead>
+            <tbody class="tbody"></tbody>
+          </table>
+        </div>
+      </details>
+    </div>
+    <div class="algo-panel__stats">
+      <div class="stat-box"><span class="stat-box__label">T.Es Promedio</span><span class="stat-box__value stat-wt"></span></div>
+      <div class="stat-box"><span class="stat-box__label">T.R Promedio</span><span class="stat-box__value stat-tat"></span></div>
+      <div class="stat-box"><span class="stat-box__label">Uso de CPU</span><span class="stat-box__value stat-util"></span></div>
+      <div class="stat-box"><span class="stat-box__label">Duración total</span><span class="stat-box__value stat-span"></span></div>
+    </div>
+  </section>
+</template>
+
+</div><!-- /sec-cpu -->
+
+<div id="sec-conc" class="hidden"></div>
+
+<script src="script.js"></script>
+<script src="concurrencia.js"></script>
+<script src="problema-fumadores.js"></script>
+<script src="problema-barbero.js"></script>
+<script src="problema-productor-consumidor.js"></script>
+<script src="problema-lectores-escritores.js"></script>
+<script src="problema-filosofos.js"></script>
+</body>
+</html>
